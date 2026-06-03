@@ -43,8 +43,8 @@ const App = () => {
           <Route path="deals" element={<FlashDeals />} />
           <Route element={<ProtectedRoute />}>
             <Route path="checkout" element={<Checkout />} />
-            <Route path="order" element={<MyOrders />} />
-            <Route path="order/:id" element={<OrderTracking />} />
+            <Route path="orders" element={<MyOrders />} />
+            <Route path="orders/:id" element={<OrderTracking />} />
             <Route path="addresses" element={<Adressess />} />
           </Route>
 
