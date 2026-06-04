@@ -13,7 +13,20 @@ const NavbarComponent = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.SubmitEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`); // encodeURIComponent asegura que la query sea válida, por si lleva espacios o caracteres especiales
+      setSearchQuery("");
+    }
+  }
+
+  const handleLogout = () => {
+    setUserMenuOpen(false)
+    navigate('/')
+  }
 
   return (
     <nav className='bg-white sticky top-0 z-50 border-b border-app-border'>
@@ -31,7 +44,9 @@ const NavbarComponent = () => {
             <Link to="deals" className='text-app-orange'>Deals</Link>
           </div>
           {/* Search */}
-          <form className='hidden sm:flex flex-1 max-w-sm text-xs sm:text-sm'>
+          <form
+            onSubmit={handleSearch}
+            className='hidden sm:flex flex-1 max-w-sm text-xs sm:text-sm'>
             <Search className='absolute left-2.5 top-1/2 -translae-y-1/2 size-4 text-zinc-500' />
 
             <input
@@ -142,7 +157,10 @@ const NavbarComponent = () => {
 
                       {user && (
                         <div className='border-t border-app-border pt-1'>
-                          <button className='flex items-center gap-3 px-4 py-2.5 text-sm text-app-error hover:bg-red-50 w-full transition-colors'>
+                          <button
+                            onClick={handleLogout}
+                            className='flex items-center gap-3 px-4 py-2.5 text-sm text-app-error hover:bg-red-50 w-full transition-colors'
+                          >
                             <LogOutIcon size={16} /> Logout
                           </button>
                         </div>
