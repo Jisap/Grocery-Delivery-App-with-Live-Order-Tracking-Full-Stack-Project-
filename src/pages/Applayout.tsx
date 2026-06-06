@@ -2,6 +2,7 @@
 import { Outlet } from 'react-router-dom'
 import Banner from '../components/Banner'
 import NavbarComponent from '../components/NavbarComponent'
+import Footer from '../components/Footer'
 
 const Applayout = () => {
   return (
@@ -13,7 +14,7 @@ const Applayout = () => {
         <Outlet />
       </main>
 
-      <p>footer</p>
+      <Footer />
       <p>cartsidebar</p>
     </>
   )
