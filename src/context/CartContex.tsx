@@ -23,7 +23,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {   //
     return saved ? JSON.parse(saved) : []
   });
 
-  const [isCartOpen, setIsCartOpen] = useState(true);                        // Estado para manejar la visibilidad del carrito
+  const [isCartOpen, setIsCartOpen] = useState(false);                        // Estado para manejar la visibilidad del carrito
 
   useEffect(() => {
     localStorage.setItem("app_cart", JSON.stringify(items))                   // Se guarda el estado del carrito en localStorage
