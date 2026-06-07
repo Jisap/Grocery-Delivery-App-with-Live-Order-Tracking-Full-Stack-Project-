@@ -13,14 +13,7 @@ const NavbarComponent = () => {
   // }
 
   const {
-    items,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
     cartCount,
-    cartTotal,
-    isCartOpen,
     setIsCartOpen
   } = useCart();
 
