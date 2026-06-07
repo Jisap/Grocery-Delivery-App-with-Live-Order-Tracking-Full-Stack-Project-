@@ -1,15 +1,29 @@
 import { ArrowUpRight, ArrowUpRightIcon, Bike, ChevronDownIcon, LogOut, LogOutIcon, MapPinIcon, MenuIcon, PackageIcon, Search, ShieldIcon, ShoppingCartIcon, StoreIcon, UserIcon, X } from 'lucide-react';
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContex';
 
 const NavbarComponent = () => {
 
   const user = null
   //const user: any = { name: "john Doe", email: "[EMAIL_ADDRESS]", isAdmin: true };
-  const { cartCount, setIsCartOpen } = {
-    cartCount: 5,
-    setIsCartOpen: (_data: any) => { }
-  }
+  // const { cartCount, setIsCartOpen } = {
+  //   cartCount: 5,
+  //   setIsCartOpen: (_data: any) => { }
+  // }
+
+  const {
+    items,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    cartCount,
+    cartTotal,
+    isCartOpen,
+    setIsCartOpen
+  } = useCart();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -46,8 +60,9 @@ const NavbarComponent = () => {
           {/* Search */}
           <form
             onSubmit={handleSearch}
-            className='hidden sm:flex flex-1 max-w-sm text-xs sm:text-sm'>
-            <Search className='absolute left-2.5 top-1/2 -translae-y-1/2 size-4 text-zinc-500' />
+            className='hidden sm:flex flex-1 max-w-sm text-xs sm:text-sm relative'
+          >
+            <Search className='absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-zinc-500' />
 
             <input
               type="text"
