@@ -5,6 +5,8 @@ import type { Product } from "../types";
 import { dummyAddressData, dummyProducts } from "../assets/assets";
 import Loading from "../components/Loading";
 import { ArrowLeftIcon, HomeIcon, LeafIcon, MinusIcon, PlusIcon, ShoppingCartIcon, Star, StarIcon } from "lucide-react";
+import DummyReviewsSection from "../components/DummyReviewsSection";
+
 
 
 const ProductPage = () => {
@@ -229,7 +231,9 @@ const ProductPage = () => {
             </div>
           </div>
         </div>
+
         {/* customer Reviews */}
+        {product.reviewCount > 0 && <DummyReviewsSection product={product} />}
 
         {/* Related Products */}
       </div>
