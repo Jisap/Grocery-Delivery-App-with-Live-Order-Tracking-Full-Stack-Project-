@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { Product } from "../types";
 import { dummyAddressData, dummyProducts } from "../assets/assets";
 import Loading from "../components/Loading";
-import { ArrowLeftIcon, HomeIcon, LeafIcon, Star, StarIcon } from "lucide-react";
+import { ArrowLeftIcon, HomeIcon, LeafIcon, MinusIcon, PlusIcon, ShoppingCartIcon, Star, StarIcon } from "lucide-react";
 
 
 const ProductPage = () => {
@@ -36,6 +36,20 @@ const ProductPage = () => {
   const inCart = !!cartItem;                                                   // Se convierte a boolean el resultado de buscar el producto en el carrito (True o False)
   const displayQuantity = inCart ? cartItem.quantity : localQuantity           // Se muestra la cantidad del producto en el carrito o la cantidad local
   const categoryLabel = product.category.replace(/-/g, " ");                   // Se reemplaza los guiones por espacios para mostrar la categoría
+
+  const handleMinus = () => {
+    if (inCart) {                                                                     // Si el producto está en el carrito
+      if (cartItem.quantity > 1) updateQuantity(product._id, cartItem.quantity - 1)   // Actualiza la cantidad del producto en el carrito
+      else removeFromCart(product._id)                                                // Si no, elimina el producto del carrito
+    } else {
+      setLocalQuantity(Math.max(1, localQuantity - 1))                                // Reduce la cantidad local del producto
+    }
+  }
+
+  const handlePlus = () => {
+    if (cartItem) updateQuantity(product._id, cartItem.quantity + 1);                 // Si el producto está en el carrito, actualiza la cantidad
+    else setLocalQuantity(localQuantity + 1)                                          // Si no, aumenta la cantidad local
+  }
 
   return (
     <div className="min-h-screen">
@@ -174,7 +188,44 @@ const ProductPage = () => {
               </div>
 
               {/* Quantity + Add to cart */}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center border border-app-border rounded-xl overflow-hidden">
+                  <button
+                    onClick={handleMinus}
+                    className="p-3 hover:bg-app-cream transition-color"
+                  >
+                    <MinusIcon className="w-4 h-4" />
+                  </button>
 
+                  <span className="px-5 text-sm font-semibold min-w-[40px] text-center">
+                    {displayQuantity}
+                  </span>
+
+                  <button
+                    onClick={handlePlus}
+                    className="p-3 hover:bg-app-cream transition-colors"
+                  >
+                    <PlusIcon className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => {
+                    if (!inCart) addToCart(product, localQuantity)
+                  }}
+                  disabled={product.stock === 0}
+                  className={`
+                    flex-1 py-3 font-semibold rounded-xl transition-colors flex-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]
+                      ${inCart
+                      ? "bg-app-cream text-app-green border border-app-green"
+                      : "bg-app-orange text-white hover:bg-app-orange-dark"
+                    }`
+                  }
+                >
+                  <ShoppingCartIcon className="w-4 h-4" />
+                  {inCart ? "Added to Cart" : "Add to Cart"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
