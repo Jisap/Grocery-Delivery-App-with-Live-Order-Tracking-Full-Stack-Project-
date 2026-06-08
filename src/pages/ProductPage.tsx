@@ -2,10 +2,11 @@ import { Link, useNavigate, useParams } from "react-router-dom"
 import { useCart } from "../context/CartContex";
 import { useEffect, useState } from "react";
 import type { Product } from "../types";
-import { dummyAddressData, dummyProducts } from "../assets/assets";
+import { dummyProducts } from "../assets/assets";
 import Loading from "../components/Loading";
 import { ArrowLeftIcon, HomeIcon, LeafIcon, MinusIcon, PlusIcon, ShoppingCartIcon, Star, StarIcon } from "lucide-react";
 import DummyReviewsSection from "../components/DummyReviewsSection";
+import ProductCard from "../components/ProductCard";
 
 
 
@@ -27,7 +28,7 @@ const ProductPage = () => {
     window.scrollTo(0, 0);
     const product = dummyProducts.find((p) => p._id === id);          // Buscamos el producto por ID
     setProduct(product!);
-    setRelatedProducts(dummyProducts.filter((p) => p._id !== id));     // Buscamos productos relacionados (excluyendo el producto actual de la lista)
+    setRelatedProducts(dummyProducts.filter((p) => p._id !== id && p.category === product.category));     // Buscamos productos relacionados de la misma categoría
     setLoading(false);
   }, [id, navigate]);
 
@@ -236,6 +237,37 @@ const ProductPage = () => {
         {product.reviewCount > 0 && <DummyReviewsSection product={product} />}
 
         {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <section className="mt-12 mb-44">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-semibold text-app-green">
+                  Related Products
+                </h2>
+
+                <p className="text-sm text-app-text-light mt-1">
+                  More from {categoryLabel}
+                </p>
+              </div>
+
+              <Link
+                to={`/products?category=${product.category}`}
+                className="text-sm font-semibold text-app-orange hover:text-app-orange-dark flex items-center gap-1 transition-colors"
+              >
+                View All <ArrowLeftIcon className='size-4' />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 xl:gap-8">
+              {relatedProducts.slice(0, 5).map((rp) => (
+                <ProductCard
+                  key={rp._id}
+                  product={rp}
+                />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   )
