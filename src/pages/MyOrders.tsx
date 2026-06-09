@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
 import type { Order } from "../types"
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useCart } from "../context/CartContex";
 import { dummyDashboardOrdersData } from "../assets/assets";
+import Loading from "../components/Loading";
+import { PackageIcon } from "lucide-react";
 
 
 const MyOrders = () => {
@@ -22,14 +24,17 @@ const MyOrders = () => {
     setLoading(false);
   }
 
-  useEffect(() => {  // Si la url tiene el parametro 'cleartCart' limpiar el carrito y la url y acontinuación carga los pedidos
+  useEffect(() => {   // Si la url tiene el parametro 'cleartCart' limpiar el carrito y la url y acontinuación carga los pedidos
     if (searchParams.get("cleartCart")) {
       clearCart();
       setSearchParams({});
       setTimeout(() => {
         fetchOrders()
-      })
+      }, 2000)
+    } else {           // Si la url no tiene el parametro 'cleartCart' carga los pedidos
+      fetchOrders()
     }
+    setLoading(false);
   }, [activeTab])
 
   return (
@@ -59,6 +64,21 @@ const MyOrders = () => {
         </div>
 
         {/* Orders List */}
+        {loading
+          ? (<Loading />)
+          : orders.length === 0
+            ? (
+              <div className="text-center py-16">
+                <PackageIcon className="size-16 text-app-border mx-auto mb-4" />
+                <h2 className="text-lg font-medium text-app-green mb-2">No orders yet</h2>
+                <p className="text-sm text-app-text-light mb-4">Start shopping to see your orders here</p>
+                <Link to="/products" className="inline-flex px-4 py-2 bg-app-green text-white text-sm rounded-lg">
+                  Start Shooping
+                </Link>
+              </div>
+            )
+            : (<div></div>)
+        }
       </div>
     </div>
   )
