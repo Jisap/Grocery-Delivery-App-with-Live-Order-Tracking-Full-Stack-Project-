@@ -60,6 +60,7 @@ export default function LiveMap({ order, liveLocation }: { order: any, liveLocat
                             <MapUpdater center={[liveLocation.lat, liveLocation.lng]} />
                         </MapContainer>
                     ) : order.shippingAddress.lat && order.shippingAddress.lng ? (
+                        // Si no hay location en vivo muestra solo el pin del destino
                         <MapContainer center={[order.shippingAddress.lat, order.shippingAddress.lng]} zoom={15} style={{ height: "100%", width: "100%" }} zoomControl={false}>
                             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
