@@ -2,9 +2,9 @@ import { useEffect, useState } from "react"
 import type { Order } from "../types"
 import { Link, useSearchParams } from "react-router-dom";
 import { useCart } from "../context/CartContex";
-import { dummyDashboardOrdersData } from "../assets/assets";
+import { dummyDashboardOrdersData, statusColors } from "../assets/assets";
 import Loading from "../components/Loading";
-import { CalendarIcon, PackageIcon } from "lucide-react";
+import { CalendarIcon, ChevronRightIcon, PackageIcon } from "lucide-react";
 
 
 const MyOrders = () => {
@@ -102,7 +102,15 @@ const MyOrders = () => {
                       </div>
 
                       {/* right */}
-                      <div></div>
+                      <div className="flex items-center gap-2">
+                        <span className={`
+                          px-4 py-1 text-xs font-medium rounded-full 
+                          ${statusColors[order.status] || "bg-gray-100 text-gray-700"}  
+                        `}>
+                          {order.status}
+                        </span>
+                        <ChevronRightIcon className="size-4 text-app-text-light" />
+                      </div>
                     </div>
 
                     {/* items thumbnails */}
