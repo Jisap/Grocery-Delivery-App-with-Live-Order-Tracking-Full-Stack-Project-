@@ -114,9 +114,28 @@ const MyOrders = () => {
                     </div>
 
                     {/* items thumbnails */}
+                    <div className="flex items-center gap-2 mb-3">
+                      {order.items.slice(0, 4).map((item, i) => (
+                        <img
+                          key={i}
+                          src={item.image}
+                          alt={item.name}
+                          className="size-12 sm:size-16 rounded-lg object-cover border border-app-border"
+                        />
+                      ))}
 
+                      {order.items.length > 4 && ( // Si hay mas de 4 items se muestra + número de items restantes
+                        <div className="size-12 sm:size-16 rounded-lg bg-app-cream flex-center text-xs font-semibold text-app-text-light">
+                          +{order.items.length - 4}
+                        </div>
+                      )}
+                    </div>
 
                     {/* total items & price */}
+                    <div className="flex justify-between items-center pt-3 text-sm">
+                      <span className="text-app-text-light">{order.items.length} items</span>
+                      <span className="font-semibold text-app-green">{currency}{order.total.toFixed(2)}</span>
+                    </div>
                   </Link>
                 ))}
               </div>)
