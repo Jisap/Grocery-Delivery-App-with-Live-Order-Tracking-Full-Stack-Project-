@@ -31,8 +31,10 @@ export default function OrderTimeLine({ order }: { order: any }) {
                                 <div className={`size-9 rounded-full flex-center shrink-0 ${isCompleted ? "bg-app-green text-white" : "bg-app-cream text-app-text-light"} ${isCurrent ? "ring-4 ring-app-green/20" : ""}`}>
                                     <Icon className="size-4" />
                                 </div>
+
                                 {i < allStatuses.length - 1 && <div className={`w-0.5 h-12 ${i < currentIdx ? "bg-app-green" : "bg-app-border"}`} />}
                             </div>
+
                             <div className="pb-6">
                                 <p className={`text-sm font-semibold ${isCompleted ? "text-app-green" : "text-app-text-light"}`}>{status}</p>
                                 {historyEntry && <p className="text-xs text-app-text-light mt-0.5">{new Date(historyEntry.timestamp).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</p>}
