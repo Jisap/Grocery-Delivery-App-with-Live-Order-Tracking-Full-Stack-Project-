@@ -4,13 +4,14 @@ import { dummyAddressData } from '../assets/assets';
 import { MapPinIcon, PlusIcon } from 'lucide-react';
 import Loading from '../components/Loading';
 import AddressCard from '../components/AddressCard';
+import AddressForm from '../components/AddressForm';
 
 const Adressess = () => {
 
   const [addresses, setAddressed] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     label: "",
     address: "",
@@ -30,7 +31,7 @@ const Adressess = () => {
       isDefault: false,
     });
     setShowForm(false);
-    setEditing(null);
+    setEditingId(null);
   };
 
   const handleSubmit = async (e: React.SubmitEvent) => {
@@ -46,7 +47,7 @@ const Adressess = () => {
       zip: address.zip,
       isDefault: address.isDefault,
     });
-    setEditing(address._id);
+    setEditingId(address._id);
     setShowForm(true);
   };
 
@@ -71,7 +72,13 @@ const Adressess = () => {
         </div>
 
         {/* Form Modal */}
-
+        {showForm && <AddressForm
+          resetForm={resetForm}
+          handleSubmit={handleSubmit}
+          form={form}
+          setForm={setForm}
+          editingId={editingId}
+        />}
 
         {/* Addresses List */}
 
