@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import type { Order } from "../types";
 import { dummyDashboardOrdersData } from "../assets/assets";
 import Loading from "../components/Loading";
-import { ArrowLeftIcon, PhoneIcon } from "lucide-react";
+import { ArrowLeftIcon, MapIcon, PhoneIcon, ShoppingBagIcon } from "lucide-react";
 import OrderOTP from "../components/OrderTracking/OrderOTP";
 import LiveMap from "../components/OrderTracking/LiveMap";
 import OrderTimeLine from "../components/OrderTracking/OrderTimeLine";
@@ -110,8 +110,49 @@ const OrderTracking = () => {
           </div>
 
           {/* Right side - Order Details */}
-          <div>
+          <div className="space-y-5">
+            {/* Delivery Address */}
+            <div className="bg-white rounded-2xl p-5">
+              <h3 className="text-sm font-semibold text-app-green mb-3 flex items-center gap-2">
+                <MapIcon className="size-4" />
+                Delivery Address
+              </h3>
 
+              <p className="text-sm text-app-text-light leading-relaxed">
+                {order?.shippingAddress.label}
+                <br />
+                {order?.shippingAddress.address}
+                <br />
+                {order?.shippingAddress.city}, {order?.shippingAddress.state}
+                {order?.shippingAddress.zip}
+              </p>
+            </div>
+
+            {/* Items */}
+            <div className="bg-white rounded-2xl p-5">
+              <h3 className="text-sm font-semibold text-app-green mb-3 flex items-center gap-2">
+                <ShoppingBagIcon className="size-4" />
+                Items ({order?.items.length})
+              </h3>
+
+              <div className="space-y-3">
+                {order?.items.map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="size-10 rounded-lg object-cover"
+                    />
+
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-app-green truncate">{item.name}</p>
+                      <p className="text-xs text-app-text-light">x{item.quantity}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
