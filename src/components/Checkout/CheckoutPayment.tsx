@@ -1,6 +1,31 @@
 import { ChevronRightIcon, CreditCardIcon } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 
+/**
+ * CheckoutPayment Component
+ * 
+ * Componente del paso de pago dentro del flujo de checkout.
+ * Permite al usuario elegir cómo quiere pagar antes de revisar el pedido.
+ *
+ * Renders the payment method selection step within the checkout flow.
+ * Displays available payment options as selectable radio cards and allows
+ * the user to proceed to the order review step.
+ *
+ * @component
+ * @param {CheckoutPaymentProps} props
+ * @param {Dispatch<SetStateAction<string>>} props.setStep - Callback to navigate to the next checkout step ("review").
+ * @param {string} props.paymentMethod - The currently selected payment method value ("card" | "cash").
+ * @param {Dispatch<SetStateAction<string>>} props.setPaymentMethod - Callback to update the selected payment method.
+ *
+ * @example
+ * <CheckoutPayment
+ *   setStep={setCheckoutStep}
+ *   paymentMethod={selectedPaymentMethod}
+ *   setPaymentMethod={setSelectedPaymentMethod}
+ * />
+ */
+
+
 interface CheckoutPaymentProps {
   setStep: Dispatch<SetStateAction<string>>;
   paymentMethod: string;

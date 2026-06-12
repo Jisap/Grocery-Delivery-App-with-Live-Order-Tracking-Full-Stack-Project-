@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { dummyAddressData } from "../assets/assets";
 import { ArrowLeft, CheckIcon, ChevronRightIcon, CreditCardIcon, MapPinIcon } from "lucide-react";
 import CheckoutAddress from "../components/Checkout/CheckoutAddress";
+import CheckoutPayment from "../components/Checkout/CheckoutPayment";
+import CheckoutReview from "../components/Checkout/CheckoutReview";
 
 
 const Checkout = () => {
@@ -28,6 +30,8 @@ const Checkout = () => {
     lat: 0,
     lng: 0,
   });
+
+  const [paymentMethod, setPaymentMethod] = useState("card");
 
   const deliveryFee = cartTotal > 20 ? 0 : 1.99;
   const tax = cartTotal * 0.08;
@@ -107,7 +111,24 @@ const Checkout = () => {
                 userAddresses={user}
               />
             )}
-            )
+
+            {step === "payment" && (
+              <CheckoutPayment
+                paymentMethod={paymentMethod}
+                setPaymentMethod={setPaymentMethod}
+                setStep={setStep}
+              />
+            )}
+
+            {step === "review" && (
+              <CheckoutReview
+                address={address}
+                items={items}
+                handlePlaceOrder={handlePlaceOrder}
+                loading={loading}
+                total={total}
+              />
+            )}
           </div>
 
 
