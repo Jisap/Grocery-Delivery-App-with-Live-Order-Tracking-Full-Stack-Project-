@@ -11,10 +11,11 @@ import CheckoutReview from "../components/Checkout/CheckoutReview";
 const Checkout = () => {
 
   const navigate = useNavigate();
-  const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
+  // const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
 
   const { items, cartTotal } = useCart();
-  const { user } = { user: { addresses: dummyAddressData } } // Aquí TypeScript infiere automáticamente el tipo de user a partir del objeto literal que se le estás asignando.
+  //const { user } = { user: { addresses: dummyAddressData } } // Aquí TypeScript infiere automáticamente el tipo de user a partir del objeto literal que se le estás asignando.
+  const user = { addresses: dummyAddressData };
 
   const [step, setStep] = useState("address");
   const [loading, setLoading] = useState(false);
@@ -64,7 +65,7 @@ const Checkout = () => {
         lng: defaultAddr?.lng,
       });
     }
-  }, [user]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-app-cream">
@@ -108,7 +109,7 @@ const Checkout = () => {
                 address={address}
                 setAddress={setAddress}
                 setStep={setStep}
-                userAddresses={user}
+                user={user}
               />
             )}
 

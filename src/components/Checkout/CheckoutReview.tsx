@@ -13,18 +13,7 @@ import type { Address } from "../../types";
  * @component
  * @param {CheckoutReviewProps} props
  * @param {Address} props.address - The selected delivery address object.
- * @param {string} props.address.label - Human-readable label for the address (e.g. "Home").
- * @param {string} props.address.address - Street address line.
- * @param {string} props.address.city - City of the delivery address.
- * @param {string} props.address.state - State of the delivery address.
- * @param {string} props.address.zip - ZIP code of the delivery address.
  * @param {any[]} props.items - List of cart items to display in the order summary.
- * @param {Object} props.items[].product - The product object within each cart item.
- * @param {string} props.items[].product._id - Unique identifier of the product.
- * @param {string} props.items[].product.name - Display name of the product.
- * @param {string} props.items[].product.image - Image URL of the product.
- * @param {number} props.items[].product.price - Unit price of the product.
- * @param {number} props.items[].quantity - Quantity of the product in the cart.
  * @param {() => void} props.handlePlaceOrder - Callback executed when the user confirms the order.
  * @param {boolean} props.loading - Whether the order is currently being processed.
  *                                  Disables the button and shows a loading label when true.
