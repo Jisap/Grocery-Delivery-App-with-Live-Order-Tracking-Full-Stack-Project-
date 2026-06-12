@@ -1,6 +1,24 @@
 import { ChevronRightIcon, MapPinIcon, PlusIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+/**
+ * CheckoutAddress Component
+ * 
+ * @param {Object} props.user - The authenticated user object.
+ * @param {Object} props.address - The currently selected delivery address.
+ * @param {Function} props.setAddress - Callback to update the selected address state.
+ * @param {Function} props.setStep - Callback to navigate to the next checkout step.
+ * @returns 
+ * 
+ * Se encarga de que el usuario seleccione o añada una dirección de entrega 
+ * antes de pasar al paso de pago.
+ * 
+ * Renders the delivery address selection step within the checkout flow.
+ * Displays the user's saved addresses as selectable cards and allows
+ * navigation to add a new address or proceed to the payment step.
+ */
+
+
 const CheckoutAddress = ({ user, address, setAddress, setStep }: any) => {
     return (
         <div className="bg-white rounded-2xl p-6 animate-fade-in">
