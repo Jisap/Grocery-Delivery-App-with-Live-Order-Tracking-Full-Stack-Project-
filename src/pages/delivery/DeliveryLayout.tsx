@@ -4,11 +4,24 @@ import { useEffect, useState } from "react";
 import type { DeliveryPartner } from "../../types";
 import { dummyDeliveryPartnerData } from "../../assets/assets";
 
+/**
+ * Layout principal para la sección de socios de entrega (repartidores).
+ * Proporciona una barra superior con el nombre del repartidor y botón de cierre de sesión,
+ * junto con un área principal dinámica para las vistas de delivery.
+ *
+ * @component
+ * @description Componente autónomo sin props externas. Carga los datos del repartidor 
+ * desde datos mock y gestiona la navegación al cerrar sesión.
+ */
+
+
 export default function DeliveryLayout() {
     const navigate = useNavigate();
     const [partner, setPartner] = useState<DeliveryPartner | null>(null);
 
     useEffect(() => {
+        // Nota: 'navigate' como dependencia es inusual aquí ya que es estable y no se usa dentro del effect.
+        // En producción, esto debería depender del contexto de autenticación o eliminarse si solo se ejecuta una vez.
         setPartner(dummyDeliveryPartnerData[0] as DeliveryPartner);
     }, [navigate]);
 
@@ -20,7 +33,6 @@ export default function DeliveryLayout() {
 
     return (
         <div className="min-h-screen bg-app-cream">
-            {/* Top Bar */}
             <header className="bg-white border-b border-app-border sticky top-0 z-40">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2">
