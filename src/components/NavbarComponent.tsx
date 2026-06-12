@@ -5,8 +5,8 @@ import { useCart } from '../context/CartContex';
 
 const NavbarComponent = () => {
 
-  const user = null
-  //const user: any = { name: "john Doe", email: "[EMAIL_ADDRESS]", isAdmin: true };
+  //const user = null
+  const user: any = { name: "john Doe", email: "[EMAIL_ADDRESS]", isAdmin: true };
   // const { cartCount, setIsCartOpen } = {
   //   cartCount: 5,
   //   setIsCartOpen: (_data: any) => { }
