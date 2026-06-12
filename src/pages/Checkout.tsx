@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContex";
 import { useEffect, useState } from "react";
 import { dummyAddressData } from "../assets/assets";
-import { CheckIcon, CreditCardIcon, MapPinIcon } from "lucide-react";
+import { ArrowLeft, CheckIcon, CreditCardIcon, MapPinIcon } from "lucide-react";
 
 
 const Checkout = () => {
@@ -59,7 +59,18 @@ const Checkout = () => {
         lng: defaultAddr?.lng,
       });
     }
-  }, [user])
+  }, [user]);
+
+  return (
+    <div className="min-h-screen bg-app-cream">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back Button */}
+        <button className="flex items-center gap-2 text-sm text-app-text-light hover:text-app-green mb-6 transition-colors">
+          <ArrowLeft className="size-4" />
+        </button>
+      </div>
+    </div>
+  )
 
   return (
     <div>Checkout</div>
