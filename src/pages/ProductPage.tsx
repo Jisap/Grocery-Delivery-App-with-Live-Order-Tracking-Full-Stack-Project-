@@ -29,9 +29,9 @@ const ProductPage = () => {
   //   setLoading(true);
   //   setLocalQuantity(1);
   //   window.scrollTo(0, 0);
-  //   const product = dummyProducts.find((p) => p._id === id);          // Buscamos el producto por ID
+  //   const product = dummyProducts.find((p) => p.id === id);          // Buscamos el producto por ID
   //   setProduct(product!);
-  //   setRelatedProducts(dummyProducts.filter((p) => p._id !== id && p.category === product.category));     // Buscamos productos relacionados de la misma categoría
+  //   setRelatedProducts(dummyProducts.filter((p) => p.id !== id && p.category === product.category));     // Buscamos productos relacionados de la misma categoría
   //   setLoading(false);
   // }, [id, navigate]);
 

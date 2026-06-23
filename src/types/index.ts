@@ -1,6 +1,6 @@
-// Al subir a NeonDb la data en el server con el seed, el campo _id
-// se cambio a id. NeonDb al ser postgres no soporta _id. En consecuencia
-// tuve que cambiar los tipos de datos para usar id en lugar de _id.  
+// Al subir a NeonDb la data en el server con el seed, el campo id
+// se cambio a id. NeonDb al ser postgres no soporta id. En consecuencia
+// tuve que cambiar los tipos de datos para usar id en lugar de id.  
 
 
 

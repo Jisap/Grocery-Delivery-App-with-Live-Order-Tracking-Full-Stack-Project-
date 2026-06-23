@@ -31,9 +31,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {   //
 
   const addToCart = (product: Product, quantity: number = 1) => {                // Se crea la funcion addToCart que agrega un producto al carrito
     setItems(prev => {
-      const existing = prev.find((item) => item.product._id === product._id)
+      const existing = prev.find((item) => item.product.id === product.id)
       if (existing) {
-        return prev.map((item) => (item.product._id === product._id
+        return prev.map((item) => (item.product.id === product.id
           ? { ...item, quantity: item.quantity + quantity }
           : item
         ))
@@ -44,12 +44,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {   //
   }
 
   const removeFromCart = (productId: string) => {                               // Se crea la funcion removeFromCart que elimina un producto del carrito
-    setItems(prev => prev.filter((item) => item.product._id !== productId))     // Se filtra el carrito eliminando el producto con el id proporcionado
+    setItems(prev => prev.filter((item) => item.product.id !== productId))     // Se filtra el carrito eliminando el producto con el id proporcionado
   };
 
   const updateQuantity = (productId: string, quantity: number) => {             // Se crea la funcion updateQuantity que actualiza la cantidad de un producto en el carrito
     if (quantity <= 0) return removeFromCart(productId);                         // Si la cantidad es menor o igual a 0, se elimina el producto
-    setItems(prev => prev.map((item) => (item.product._id === productId
+    setItems(prev => prev.map((item) => (item.product.id === productId
       ? { ...item, quantity }
       : item)))
   };

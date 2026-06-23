@@ -40,7 +40,7 @@ export default function AdminProductForm() {
       if (isEdit) {
         // Nota: El 'as any' es un parche temporal por la estructura de dummyProducts. 
         // En producción, se debe tipar correctamente la respuesta de la API.
-        setFormData(() => dummyProducts.find((p) => p._id === id) as any);
+        setFormData(() => dummyProducts.find((p) => p.id === id) as any);
       }
       setLoading(false);
     };
