@@ -2,11 +2,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom'
 import type { Product } from '../types';
-import { categoriesData, dummyProducts } from '../assets/assets';
+import { categoriesData } from '../assets/assets';
 import { ChevronDown, Home, SlidersHorizontal, XIcon } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import Loading from '../components/Loading';
 import FilterPanel from '../components/FilterPanel';
+import api from '../config/api';
+import toast from 'react-hot-toast';
 
 const Products = () => {
 
@@ -25,30 +27,46 @@ const Products = () => {
   const category = searchParams.get('category') || '';
   const organic = searchParams.get('organic') || '';
   const sort = searchParams.get('sort') || '';
-  const page = Number(searchParams.get('page')) || '1';
+  const page = Number(searchParams.get('page')) || 1;
   const minPrice = searchParams.get('minPrice') || '';
   const maxPrice = searchParams.get('maxPrice') || '';
 
   const fetchProducts = async () => {
     setLoading(true);
-    setProducts(
-      dummyProducts.filter((p) => p.category === category || category === "") // Filtra los productos por categoría. Si no hay categoría busca en todos los productos
-    );
-    setLoading(false);
+    try {
+      const params = new URLSearchParams()
+      if (category) params.set('category', category)
+      if (organic) params.set('organic', organic)
+      if (sort) params.set('sort', sort)
+      if (minPrice) params.set('minPrice', minPrice)
+      if (maxPrice) params.set('maxPrice', maxPrice)
+
+      params.set("page", String(page))
+      params.set("limit", "12")
+
+      const { data } = await api.get(`/products?${params.toString()}`)
+      setProducts(data.products)
+      setTotalPages(data.totalPages)
+
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message);
+    } finally {
+      setLoading(false)
+    }
   };
 
   useEffect(() => {
     fetchProducts();
-  }, [searchParams, organic, sort, page, minPrice, maxPrice]);
+  }, [searchParams]);
 
   const updateFilter = (key: string, value: string) => {          // Actualiza los filtros
     const newParams = new URLSearchParams(searchParams);          // Crear una copia de los parametros actuales de la URL
-    if (value) {                                                   // Si hay un valor, establecer el parametro 
+    if (value) {                                                  // Si hay un valor, establecer el parametro 
       newParams.set(key, value)
     } else {                                                      // Si no hay valor, eliminar el parametro
       newParams.delete(key);
     }
-    if (key !== "page") {                                           // Si la clave no es "page", eliminar "page"
+    if (key !== "page") {                                         // Si la clave no es "page", eliminar "page"
       newParams.delete("page")
     }
     setSearchParams(newParams)                                    // Actualizar los parametros de la URL

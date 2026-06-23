@@ -2,7 +2,6 @@ import { Link, useNavigate, useParams } from "react-router-dom"
 import { useCart } from "../context/CartContex";
 import { useEffect, useState } from "react";
 import type { Product } from "../types";
-//import { dummyProducts } from "../assets/assets";
 import Loading from "../components/Loading";
 import { ArrowLeftIcon, HomeIcon, LeafIcon, MinusIcon, PlusIcon, ShoppingCartIcon, Star, StarIcon } from "lucide-react";
 import DummyReviewsSection from "../components/DummyReviewsSection";
@@ -23,17 +22,6 @@ const ProductPage = () => {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [localQuantity, setLocalQuantity] = useState(1)
-
-  // Local version to test  
-  // useEffect(() => {
-  //   setLoading(true);
-  //   setLocalQuantity(1);
-  //   window.scrollTo(0, 0);
-  //   const product = dummyProducts.find((p) => p.id === id);          // Buscamos el producto por ID
-  //   setProduct(product!);
-  //   setRelatedProducts(dummyProducts.filter((p) => p.id !== id && p.category === product.category));     // Buscamos productos relacionados de la misma categoría
-  //   setLoading(false);
-  // }, [id, navigate]);
 
   useEffect(() => {
     setLoading(true);
