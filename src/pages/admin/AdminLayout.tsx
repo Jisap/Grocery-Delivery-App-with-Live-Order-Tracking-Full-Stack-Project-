@@ -1,6 +1,7 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { Navigate, NavLink, Outlet } from "react-router-dom";
 import { PlusIcon, PackageSearchIcon, ShoppingBagIcon, LogOutIcon, BarChart3Icon, ShieldIcon, Truck } from "lucide-react";
 import Navbar from "../../components/NavbarComponent";
+import { useAuth } from "../../context/AuthContext";
 
 const AdminLinkData = [
   { to: "/admin", label: "Dashboard", icon: BarChart3Icon },
@@ -26,6 +27,12 @@ const AdminLinkData = [
  * @param {React.ReactNode} [props.children] - Contenido renderizado dinámicamente por <Outlet />.
  */
 export default function AdminLayout() {
+
+  const { user, logout } = useAuth();   // Solo los administradores pueden acceder a esta ruta
+  if (!user?.isAdmin) {
+    return <Navigate to="/" replace />
+  }
+
   return (
     <div className="h-screen overflow-hidden">
       <div className="max-lg:hidden">
@@ -49,8 +56,8 @@ export default function AdminLayout() {
                 // permanecería activo (iluminado) en todas las subrutas de /admin/*
                 end={true}
                 className={({ isActive }) => `flex items-center gap-3 p-2.5 rounded-md text-sm transition-colors ${isActive
-                    ? "bg-app-green text-white"
-                    : "text-app-text-light hover:bg-orange-50 hover:text-zinc-900"
+                  ? "bg-app-green text-white"
+                  : "text-app-text-light hover:bg-orange-50 hover:text-zinc-900"
                   }`}
               >
                 <link.icon className="size-4" /> {link.label}
