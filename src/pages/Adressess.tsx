@@ -5,10 +5,15 @@ import { MapPinIcon, PlusIcon } from 'lucide-react';
 import Loading from '../components/Loading';
 import AddressCard from '../components/AddressCard';
 import AddressForm from '../components/AddressForm';
+import { useAuth } from '../context/AuthContext';
+import api from '../config/api';
+import toast from 'react-hot-toast';
 
 const Adressess = () => {
 
-  const [addresses, setAddressed] = useState<Address[]>([]);
+  const { user, updateUser } = useAuth();
+
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -34,8 +39,56 @@ const Adressess = () => {
     setEditingId(null);
   };
 
+  const getLocation = (retries = 3): Promise<{ lat: number, lng: number }> => {  // Optiene la ubicacion del usuario con reintentos
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {                                              // 1º verificar si el navegador soporta la geolocalizacion
+        reject(new Error("Geolocation not supported"))
+        return
+      }
+
+      const attempt = () => {                                                  // 2º contabilizamos los reintentos de geolocalizacion
+        navigator.geolocation.getCurrentPosition(
+          (position) => resolve({ lat: position.coords.latitude, lng: position.coords.longitude }), // Obtiene la ubicación
+          (error: any) => {                                                                         // En caso de error
+            if (retries > 0) {                                                                      // Si quedan reintentos
+              retries--                                                                             // Decrementa el contador de reintentos
+              setTimeout(attempt, 1000)                                                             // Espera 1 segundo y vuelve a intentarlo
+            } else {                                                                                // Si no quedan reintentos
+              reject(new Error(error.message || "Failed to get location after retries"))            // Rechaza la promesa con el mensaje de error
+            }
+          },
+          {
+            enableHighAccuracy: false,                                                            // Precisión de la ubicación
+            timeout: 15000,                                                                       // Tiempo máximo de espera para obtener la ubicación
+            maximumAge: 60000                                                                     // Tiempo máximo que se puede usar una ubicación cacheada
+          }
+        )
+      }
+      attempt()
+    })
+  }
+
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
+    try {
+      const coords = await getLocation();                                        // Obtenemos la ubicacion del usuario
+      const payload = { ...form, ...coords };                                    // Creamos el payload con los datos del formulario y la ubicación
+
+      if (editingId) {                                                           // Si hay un ID de edición
+        const { data } = await api.put(`/addresses/${editingId}`, payload)       // Actualizamos la dirección en bd
+        setAddresses(data.addresses)                                             // Actualizamos el estado 
+        updateUser({ addresses: data.addresses })                                // Actualizamos el usuario en el estado localstorage
+        toast.success("Address updated successfully")                            // Mostramos un mensaje de éxito
+      } else {                                                                   // Si no hay un ID de edición
+        const { data } = await api.post(`/addresses`, payload)                   // Creamos la dirección
+        setAddresses(data.addresses)                                             // Actualizamos el estado local
+        updateUser({ addresses: data.addresses })                                // Actualizamos el usuario en el estado localstorage
+        toast.success("Address added successfully")
+      }
+      resetForm();                                                               // Reiniciamos el formulario
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Error")
+    }
   };
 
   const onEditHandler = (address: Address) => {
@@ -52,7 +105,7 @@ const Adressess = () => {
   };
 
   useEffect(() => {
-    setAddressed(dummyAddressData);
+    setAddresses(dummyAddressData);
     setTimeout(() => setLoading(false), 1000)
   }, []);
 
@@ -98,7 +151,7 @@ const Adressess = () => {
                 key={add.id}
                 addr={add}
                 onEditHandler={onEditHandler}
-                setAddresses={setAddressed}
+                setAddresses={setAddresses}
               />
             ))}
           </div>
