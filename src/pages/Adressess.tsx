@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import type { Address } from '../types'
-import { dummyAddressData } from '../assets/assets';
 import { MapPinIcon, PlusIcon } from 'lucide-react';
 import Loading from '../components/Loading';
 import AddressCard from '../components/AddressCard';
@@ -15,6 +14,7 @@ const Adressess = () => {
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -39,37 +39,30 @@ const Adressess = () => {
     setEditingId(null);
   };
 
-  const getLocation = (retries = 3): Promise<{ lat: number, lng: number }> => {  // Optiene la ubicacion del usuario con reintentos
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {                                              // 1º verificar si el navegador soporta la geolocalizacion
-        reject(new Error("Geolocation not supported"))
-        return
-      }
+  const getLocation = (): Promise<{ lat: number | null, lng: number | null }> => {
+    if (!navigator.geolocation) {
+      return Promise.resolve({ lat: null, lng: null });
+    }
 
-      const attempt = () => {                                                  // 2º contabilizamos los reintentos de geolocalizacion
-        navigator.geolocation.getCurrentPosition(
-          (position) => resolve({ lat: position.coords.latitude, lng: position.coords.longitude }), // Obtiene la ubicación
-          (error: any) => {                                                                         // En caso de error
-            if (retries > 0) {                                                                      // Si quedan reintentos
-              retries--                                                                             // Decrementa el contador de reintentos
-              setTimeout(attempt, 1000)                                                             // Espera 1 segundo y vuelve a intentarlo
-            } else {                                                                                // Si no quedan reintentos
-              reject(new Error(error.message || "Failed to get location after retries"))            // Rechaza la promesa con el mensaje de error
-            }
-          },
-          {
-            enableHighAccuracy: false,                                                            // Precisión de la ubicación
-            timeout: 15000,                                                                       // Tiempo máximo de espera para obtener la ubicación
-            maximumAge: 60000                                                                     // Tiempo máximo que se puede usar una ubicación cacheada
-          }
-        )
-      }
-      attempt()
-    })
+    const locationPromise = new Promise<{ lat: number | null, lng: number | null }>((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => resolve({ lat: position.coords.latitude, lng: position.coords.longitude }),
+        () => resolve({ lat: null, lng: null }),   // En caso de error, continuar sin coords
+        { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+      );
+    });
+
+    // Hard timeout: si el navegador no responde en 9s, continuamos sin coords
+    const timeoutPromise = new Promise<{ lat: null, lng: null }>((resolve) =>
+      setTimeout(() => resolve({ lat: null, lng: null }), 9000)
+    );
+
+    return Promise.race([locationPromise, timeoutPromise]);
   }
 
-  const handleSubmit = async (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
       const coords = await getLocation();                                        // Obtenemos la ubicacion del usuario
       const payload = { ...form, ...coords };                                    // Creamos el payload con los datos del formulario y la ubicación
@@ -87,9 +80,14 @@ const Adressess = () => {
       }
       resetForm();                                                               // Reiniciamos el formulario
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Error")
+      const msg = error?.response?.data?.message || error?.message || "Unexpected error";
+      toast.error(msg);
+      console.error("handleSubmit error:", error);
+    } finally {
+      setSubmitting(false);
     }
   };
+
 
   const onEditHandler = (address: Address) => {
     setForm({
@@ -105,17 +103,40 @@ const Adressess = () => {
   };
 
   useEffect(() => {
-    setAddresses(dummyAddressData);
-    setTimeout(() => setLoading(false), 1000)
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+    api.get("/addresses", { signal: controller.signal })
+      .then(({ data }) => {
+        setAddresses(data.addresses);
+      })
+      .catch((error) => {
+        if (error.name === "CanceledError" || error.code === "ERR_CANCELED") {
+          console.warn("Request timed out");
+          toast.error("Request timed out. Please try again.");
+        } else {
+          console.error("Error fetching addresses:", error);
+          toast.error(error?.response?.data?.message || "Error fetching addresses");
+        }
+      })
+      .finally(() => {
+        clearTimeout(timeout);
+        setLoading(false);
+      });
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
   }, []);
 
 
   return (
-    <div className='minh-screen bg-app-cream'>
+    <div className='min-h-screen bg-app-cream'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* page header */}
         <div className='flex items-center justify-between mb-8'>
-          <h1 className='text-2xl font-semibold text-app-greem'>My Addresses</h1>
+          <h1 className='text-2xl font-semibold text-app-green'>My Addresses</h1>
           <button
             onClick={() => { resetForm(); setShowForm(true) }}
             className='px-4 py-2 bg-app-green text-white text-sm font-semibold rounded-xl hover:bg-app-green-light transition-colors flex items-center gap-2'
@@ -131,6 +152,7 @@ const Adressess = () => {
           form={form}
           setForm={setForm}
           editingId={editingId}
+          submitting={submitting}
         />}
 
         {/* Addresses List */}

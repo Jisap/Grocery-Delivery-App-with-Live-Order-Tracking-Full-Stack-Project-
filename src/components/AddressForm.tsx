@@ -1,7 +1,7 @@
-import { XIcon } from "lucide-react"
+import { Loader2Icon, XIcon } from "lucide-react"
 
 
-const AddressForm = ({ resetForm, handleSubmit, form, setForm, editingId }: any) => {
+const AddressForm = ({ resetForm, handleSubmit, form, setForm, editingId, submitting }: any) => {
   return (
     <>
       {/* overlay */}
@@ -108,9 +108,17 @@ const AddressForm = ({ resetForm, handleSubmit, form, setForm, editingId }: any)
           {/* Submit button */}
           <button
             type="submit"
-            className="mt-6 w-full py-3 bg-app-green text-white font-semibold rounded-xl hover:bg-app-green-light transition-colors"
+            disabled={submitting}
+            className="mt-6 w-full py-3 bg-app-green text-white font-semibold rounded-xl hover:bg-app-green-light transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {editingId ? "Update Address" : "Add Address"}
+            {submitting ? (
+              <>
+                <Loader2Icon className="size-4 animate-spin" />
+                Getting location...
+              </>
+            ) : (
+              editingId ? "Update Address" : "Add Address"
+            )}
           </button>
         </form>
       </div>
