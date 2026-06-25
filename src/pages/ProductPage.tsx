@@ -55,16 +55,16 @@ const ProductPage = () => {
   const categoryLabel = product.category.replace(/-/g, " ");                   // Se reemplaza los guiones por espacios para mostrar la categoría
 
   const handleMinus = () => {
-    if (inCart) {                                                                     // Si el producto está en el carrito
-      if (cartItem.quantity > 1) updateQuantity(product.id, cartItem.quantity - 1)   // Actualiza la cantidad del producto en el carrito
-      else removeFromCart(product.id)                                                // Si no, elimina el producto del carrito
+    if (inCart) {                                                                      // Si el producto está en el carrito
+      if (cartItem.quantity > 1) updateQuantity(product.id, cartItem.quantity - 1)     // Actualiza la cantidad del producto en el carrito
+      else removeFromCart(product.id)                                                  // Si no, elimina el producto del carrito
     } else {
-      setLocalQuantity(Math.max(1, localQuantity - 1))                                // Reduce la cantidad local del producto
+      setLocalQuantity(Math.max(1, localQuantity - 1))                                 // Reduce la cantidad local del producto
     }
   }
 
   const handlePlus = () => {
-    if (cartItem) updateQuantity(product.id, cartItem.quantity + 1);                 // Si el producto está en el carrito, actualiza la cantidad
+    if (cartItem) updateQuantity(product.id, cartItem.quantity + 1);                  // Si el producto está en el carrito, actualiza la cantidad
     else setLocalQuantity(localQuantity + 1)                                          // Si no, aumenta la cantidad local
   }
 
