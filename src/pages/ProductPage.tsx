@@ -31,10 +31,10 @@ const ProductPage = () => {
     api.get(`/products/${id}`)
       .then(({ data }) => {
         setProduct(data.product);
-        return api.get(`/products?category=${data.product.category}`);
+        return api.get(`/products?category=${data.product.category}`);     // Obtiene los productos de la misma categoría
       })
       .then(({ data }) => {
-        const related = data.products.filter((p: Product) => p.id !== id);
+        const related = data.products.filter((p: Product) => p.id !== id); // De esos productos se muestran los que no coincidan con la id del producto actual
         setRelatedProducts(related);
         setLoading(false);
       })
@@ -42,9 +42,12 @@ const ProductPage = () => {
         console.error("Error completo:", error);
         console.error("Error response:", error.response?.data);
         toast.error(error.response?.data?.message || error.message);
+        navigate("/products");
+      })
+      .finally(() => {
         setLoading(false);
-      });
-  }, [id]);
+      })
+  }, [id, navigate]);
 
   if (loading) return <Loading />
   if (!product) return null
