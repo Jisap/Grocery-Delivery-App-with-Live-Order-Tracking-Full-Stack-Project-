@@ -2,9 +2,11 @@ import { useEffect, useState } from "react"
 import type { Order } from "../types"
 import { Link, useSearchParams } from "react-router-dom";
 import { useCart } from "../context/CartContex";
-import { dummyDashboardOrdersData, statusColors } from "../assets/assets";
+import { statusColors } from "../assets/assets";
 import Loading from "../components/Loading";
 import { CalendarIcon, ChevronRightIcon, PackageIcon } from "lucide-react";
+import api from "../config/api";
+import toast from "react-hot-toast";
 
 
 const MyOrders = () => {
@@ -19,12 +21,20 @@ const MyOrders = () => {
 
   const { clearCart } = useCart();
 
-  const fetchOrders = async () => {
-    setOrders(dummyDashboardOrdersData as any)
-    setLoading(false);
+  const fetchOrders = async () => {                                         // Obtenemos los pedidos del usuario desde la base de datos
+    setLoading(true);
+    try {
+      const params = activeTab !== "all" ? `?status=${activeTab}` : "";     // Si el estado no es "all" se añade el parametro a la url
+      const { data } = await api.get(`/orders/${params}`);                  // Hacemos la peticion a la api
+      setOrders(data.orders);                                               // Guardamos los pedidos en el estado
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || error?.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  useEffect(() => {   // Si la url tiene el parametro 'cleartCart' limpiar el carrito y la url y acontinuación carga los pedidos
+  useEffect(() => {   // Si la url tiene el parametro 'cleartCart' limpia el carrito y la url y acontinuación carga los pedidos
     if (searchParams.get("cleartCart")) {
       clearCart();
       setSearchParams({});
