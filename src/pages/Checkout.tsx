@@ -1,11 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContex";
 import { useEffect, useState } from "react";
-import { dummyAddressData } from "../assets/assets";
+//import { dummyAddressData } from "../assets/assets";
 import { ArrowLeft, CheckIcon, ChevronRightIcon, CreditCardIcon, MapPinIcon } from "lucide-react";
 import CheckoutAddress from "../components/Checkout/CheckoutAddress";
 import CheckoutPayment from "../components/Checkout/CheckoutPayment";
 import CheckoutReview from "../components/Checkout/CheckoutReview";
+import api from "../config/api";
+import toast from "react-hot-toast/headless";
+import { useAuth } from "../context/AuthContext";
 
 
 const Checkout = () => {
@@ -13,9 +16,10 @@ const Checkout = () => {
   const navigate = useNavigate();
   const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
 
-  const { items, cartTotal } = useCart();
+  const { items, cartTotal, clearCart } = useCart();
   //const { user } = { user: { addresses: dummyAddressData } } // Aquí TypeScript infiere automáticamente el tipo de user a partir del objeto literal que se le estás asignando.
-  const user = { addresses: dummyAddressData };
+  //const user = { addresses: dummyAddressData };
+  const { user } = useAuth();
 
   const [step, setStep] = useState("address");
   const [loading, setLoading] = useState(false);
@@ -46,7 +50,34 @@ const Checkout = () => {
 
   const handlePlaceOrder = async () => {
     setLoading(true);
-    navigate("/orders")
+    try {
+      const orderData = {                                                 // Creamos el objeto orderData
+        items: items.map((item) => ({                                     // y lo rellenaremos con el mapeo de items del carrito
+          product: item.product.id,
+          quantity: item.quantity,
+        })),
+        shippingAddress: address,                                         // Le añadiremos la dirección del usuario logueado 
+        paymentMethod                                                     // y el método de pago seleccionado
+      }
+
+      const { data } = await api.post("/orders", orderData);               // Hacemos la petición al backend
+      console.log(data);
+
+      if (data.url) {
+        window.location.href = data.url;                                  // Si en el backend hay url(sesion de pago en una pasarela de pagos), redirigimos al usuario a la pasarela de pago
+        return
+      }
+
+      clearCart();
+      toast.success("Order placed successfully!");
+      navigate(`/orders/${data.order.id}`);
+
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to place order");
+    } finally {
+      setLoading(false);
+      scrollTo(0, 0);
+    }
   };
 
   // Populate address from user's default address
