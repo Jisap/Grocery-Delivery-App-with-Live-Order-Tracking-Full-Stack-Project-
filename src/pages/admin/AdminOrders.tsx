@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import type { DeliveryPartner } from "../../types";
 import Loading from "../../components/Loading";
 import { dummyDashboardOrdersData, dummyDeliveryPartnerData } from "../../assets/assets";
+import api from "../../config/api";
 
 /**
  * Vista de administración para gestionar pedidos.
@@ -27,15 +28,24 @@ export default function AdminOrders() {
   const [selectedPartner, setSelectedPartner] = useState("");
 
   const fetchOrders = async () => {
-    // Simulación de llamada a API. Reemplazar con fetch real en producción.
-    setOrders(dummyDashboardOrdersData);
-    setTimeout(() => setLoading(false), 1000);
+    try {
+      const { data } = await api.get("/orders/all")
+      setOrders(data.orders)
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to load orders")
+    } finally {
+      setLoading(false)
+    }
+
   };
 
   const fetchPartners = async () => {
-    // Simulación de llamada a API. Reemplazar con fetch real en producción.
-    setPartners(dummyDeliveryPartnerData as any);
-    setTimeout(() => setLoading(false), 1000);
+    try {
+      const { data } = await api.get("/admin/delivery-partners")
+      setPartners(data.partners.filter((p: DeliveryPartner) => p.isActive))
+    } catch (error: any) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -44,15 +54,31 @@ export default function AdminOrders() {
   }, []);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
-    console.log(id, newStatus); // Pendiente: Implementar llamada a la API para actualizar el estado.
+    // backup para rollback si falla
+    const previous = orders;                                                                   // Antes de la petición → guardo una copia del array actual en previous.
+    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: newStatus } : o)));     // Actualizo el estado local inmediatamente, simulando que todo va bien.
+
+    try {
+      await api.put(`/orders/${id}/status`, { status: newStatus });                            // Hago el PUT al servidor. 
+      toast.success("Order status updated successfully");                                      // Si todo va bien → toast OK. → no uso previous, el state local ya está bien. 
+    } catch (error: any) {                                                                     // Si falla → revierto el state al snapshot: setOrders(previous). → toast error.
+      setOrders(previous);
+      toast.error(error.response?.data?.message || "Failed to update order status");
+    }
   };
 
   const handleAssign = async () => {
     if (!assignModal || !selectedPartner) return;
-    toast.success("Delivery partner assigned!");
-    setAssignModal(null);
-    setSelectedPartner("");
-    // Pendiente: Implementar llamada a la API para persistir la asignación.
+    try {
+      await api.put(`/admin/orders/${assignModal}/assign`, { deliveryPartnerId: selectedPartner })
+      toast.success("Delivery partner assigned successfully")
+      setAssignModal(null)
+      setSelectedPartner("")
+      fetchOrders()
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response?.data?.message || "Failed to assign delivery partner");
+    }
   };
 
   const statusOptions = ["Placed", "Confirmed", "Assigned", "Packed", "Out for Delivery", "Delivered", "Cancelled"];
