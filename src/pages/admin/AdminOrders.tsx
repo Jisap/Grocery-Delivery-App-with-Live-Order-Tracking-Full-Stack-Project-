@@ -13,9 +13,6 @@ import api from "../../config/api";
  * socios de entrega disponibles de forma dinámica.
  *
  * @component
- * @description Componente autónomo sin props externas. Utiliza datos mock 
- * (`dummyDashboardOrdersData`, `dummyDeliveryPartnerData`) y gestiona estados 
- * locales para la carga y el modal de asignación.
  */
 export default function AdminOrders() {
 

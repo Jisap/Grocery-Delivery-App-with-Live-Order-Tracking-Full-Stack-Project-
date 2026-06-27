@@ -4,15 +4,15 @@ import { PlusIcon, EditIcon, XIcon } from "lucide-react";
 import type { Product } from "../../types";
 import Loading from "../../components/Loading";
 import { dummyProducts } from "../../assets/assets";
+import api from "../../config/api";
+import toast from "react-hot-toast";
 
 /**
  * Vista de administración que lista todos los productos en una tabla.
  * Muestra información clave como imagen, nombre, categoría, precio y estado del stock,
  * junto con acciones rápidas para editar o marcar un producto como agotado.
  *
- * @component
- * @description Componente autónomo sin props externas. Utiliza datos mock (`dummyProducts`)
- * simulando una latencia de red y formatea los precios según `VITE_CURRENCY_SYMBOL`.
+ * @component.
  */
 
 
@@ -24,11 +24,14 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true);
 
   const fetchProducts = async () => {
-    // Simulación de latencia de red. Reemplazar por fetch/axios real a la API en producción.
-    setProducts(dummyProducts);
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    try {
+      const { data } = await api.get("/products")
+      setProducts(data.products)
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to load products")
+    } finally {
+      setLoading(false)
+    }
   };
 
   useEffect(() => {
@@ -37,7 +40,14 @@ export default function AdminProducts() {
 
   const handleMarkOutOfStock = async (id: string, name: string) => {
     if (!window.confirm(`Are you sure you want to mark "${name}" as out of stock?`)) return;
-    console.log(id); // Pendiente: Implementar llamada a la API para actualizar el stock.
+    // Llamada a la API para actualizar el stock.
+    try {
+      await api.delete(`/products/${id}`)
+      toast.success("Product marked as out of stock")
+      fetchProducts()
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to mark product as out of stock")
+    }
   };
 
   if (loading) return <Loading />
