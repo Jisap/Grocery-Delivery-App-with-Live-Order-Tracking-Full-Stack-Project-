@@ -20,7 +20,7 @@ export default function AdminDeliveryPartners() {
   const fetchPartners = async () => {
     try {
       const { data } = await api.get("/admin/delivery-partners");
-      setPartners(data);
+      setPartners(data);//Array
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to load delivery partners");
     } finally {

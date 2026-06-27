@@ -3,7 +3,6 @@ import { TruckIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import type { DeliveryPartner } from "../../types";
 import Loading from "../../components/Loading";
-import { dummyDashboardOrdersData, dummyDeliveryPartnerData } from "../../assets/assets";
 import api from "../../config/api";
 
 /**
@@ -39,7 +38,7 @@ export default function AdminOrders() {
   const fetchPartners = async () => {
     try {
       const { data } = await api.get("/admin/delivery-partners")
-      setPartners(data.partners.filter((p: DeliveryPartner) => p.isActive))
+      setPartners(data.filter((p: DeliveryPartner) => p.isActive))
     } catch (error: any) {
       console.log(error);
     }
@@ -67,7 +66,7 @@ export default function AdminOrders() {
   const handleAssign = async () => {
     if (!assignModal || !selectedPartner) return;
     try {
-      await api.put(`/admin/orders/${assignModal}/assign`, { deliveryPartnerId: selectedPartner })
+      await api.put(`/admin/orders/${assignModal}/assign`, { partnerId: selectedPartner })
       toast.success("Delivery partner assigned successfully")
       setAssignModal(null)
       setSelectedPartner("")
