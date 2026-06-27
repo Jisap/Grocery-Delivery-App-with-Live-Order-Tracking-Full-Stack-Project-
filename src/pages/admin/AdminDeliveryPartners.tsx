@@ -2,16 +2,13 @@ import { useEffect, useState } from "react";
 import { PlusIcon, XIcon, TruckIcon, PhoneIcon, MailIcon } from "lucide-react";
 import type { DeliveryPartner } from "../../types";
 import Loading from "../../components/Loading";
-import { dummyDeliveryPartnerData } from "../../assets/assets";
+import api from "../../config/api";
+import toast from "react-hot-toast";
 
 /**
  * Panel de administración para gestionar socios de entrega (repartidores).
  * Muestra una cuadrícula con los repartidores, sus datos de contacto y permite
  * cambiar su estado (Activo/Inactivo). Incluye un modal para registrar nuevos socios.
- *
- * @component
- * @description Componente autónomo sin props externas. Utiliza datos mock 
- * (`dummyDeliveryPartnerData`) y gestiona el estado local para el formulario de creación.
  */
 export default function AdminDeliveryPartners() {
   const [partners, setPartners] = useState<DeliveryPartner[]>([]);
@@ -21,9 +18,14 @@ export default function AdminDeliveryPartners() {
   const [form, setForm] = useState({ name: "", email: "", password: "", phone: "", vehicleType: "bike" });
 
   const fetchPartners = async () => {
-    // Simulación de llamada a API. Reemplazar con fetch real en producción.
-    setPartners(dummyDeliveryPartnerData as any);
-    setTimeout(() => setLoading(false), 1000);
+    try {
+      const { data } = await api.get("/admin/delivery-partners");
+      setPartners(data.partners);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to load delivery partners");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
