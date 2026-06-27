@@ -34,7 +34,18 @@ export default function AdminDeliveryPartners() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Pendiente: Implementar llamada a la API (POST) para crear el nuevo socio.
+    setSaving(true);
+    try {
+      await api.post("/admin/delivery-partners", form);
+      toast.success("Partner onboarded successfully");
+      setShowForm(false);
+      setForm({ name: "", email: "", password: "", phone: "", vehicleType: "bike" });
+      fetchPartners();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to add delivery partner");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const toggleActive = async (id: string, isActive: boolean) => {
