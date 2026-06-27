@@ -20,7 +20,6 @@ export default function AdminDeliveryPartners() {
   const fetchPartners = async () => {
     try {
       const { data } = await api.get("/admin/delivery-partners");
-      console.log("API response:", data);
       setPartners(data);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to load delivery partners");
@@ -50,8 +49,13 @@ export default function AdminDeliveryPartners() {
   };
 
   const toggleActive = async (id: string, isActive: boolean) => {
-    // Pendiente: Implementar llamada a la API (PATCH/PUT) para actualizar el estado.
-    console.log(id, isActive);
+    try {
+      await api.put(`/admin/delivery-partners/${id}`, { isActive: !isActive });
+      toast.success("Partner status updated successfully");
+      fetchPartners();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to update partner status");
+    }
   };
 
   if (loading) return <Loading />;
