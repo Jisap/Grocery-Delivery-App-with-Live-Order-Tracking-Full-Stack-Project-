@@ -2,7 +2,7 @@ import { KeyRoundIcon } from 'lucide-react'
 
 export default function OrderOTP({ order }: { order: any }) {
 
-    const showOtp = order.deliveryOtp?.trim().length > 0 && ["Assigned", "Packed", "Out for Delivery"].includes(order.status);
+    const showOtp = order.deliveryOtp?.trim().length > 0 && ["Assigned", "Packed", "Out for delivery"].includes(order.status);
     if (!showOtp) return null;
 
     return (
