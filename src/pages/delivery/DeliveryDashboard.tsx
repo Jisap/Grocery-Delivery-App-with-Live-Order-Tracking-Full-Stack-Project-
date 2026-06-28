@@ -64,7 +64,7 @@ export default function DeliveryDashboard() {
 
   // Send location every 10s for active deliveries
   useEffect(() => {                                                                                           // El rastreo solo se activa si se cumplen dos condiciones al inicio del useEffect:
-    const activeOrders = orders.filter((o) => ["Assigned", "Packed", "Out for Delivery"].includes(o.status))  // Debe haber al menos un pedido en estado activo y el usuario debe haber habilitado el botón de compartir ubicación.
+    const activeOrders = orders.filter((o) => ["Assigned", "Packed", "Out for delivery"].includes(o.status))  // Debe haber al menos un pedido en estado activo y el usuario debe haber habilitado el botón de compartir ubicación.
     if (activeOrders.length === 0 || !tracking) {                                                             // Si no se cumple alguna de estas condiciones, el efecto se detiene.
       if (watchIdRef.current !== null) {
         navigator.geolocation.clearWatch(watchIdRef.current);
