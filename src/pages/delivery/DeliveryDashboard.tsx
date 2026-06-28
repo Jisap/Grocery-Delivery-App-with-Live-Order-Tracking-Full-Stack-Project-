@@ -107,30 +107,46 @@ export default function DeliveryDashboard() {
 
 
 
-  const handleUpdateStatus = async (orderId: string, status: string) => {
-    console.log(orderId, status); // Pendiente: Implementar llamada a la API.
+  const handleUpdateStatus = async (orderId: string, status: string) => {                                      // Función que actualiza el estado de un pedido.
+    try {
+      await axios.put(`${API_URL}/delivery/my-deliveries/${orderId}/status`, { status }, getAuthHeaders());
+      toast.success(`Status updated to ${status}`);
+      fetchOrders();
+    } catch (error: any) {
+      toast.error(error?.response?.data.message || "Failed to update status");
+    }
   };
 
-  const handleComplete = async () => {
+  const handleComplete = async () => {                                                                          // Función que completa un pedido.
     if (!otpModal || !otp) return;
     setSubmitting(true);
-    // Simulación de latencia de red. Reemplazar por llamada real a la API de verificación de OTP.
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      await axios.put(`${API_URL}/delivery/my-deliveries/${otpModal}/complete`, { otp }, getAuthHeaders());
+      toast.success("Delivery completed");
       setOtpModal(null);
-      setOtp("");
-    }, 1000);
+      setOtp("")
+      fetchOrders();
+    } catch (error: any) {
+      toast.error(error?.response?.data.message || error?.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleCancel = async () => {
     if (!cancelModal) return;
     setSubmitting(true);
-    // Simulación de latencia de red. Reemplazar por llamada real a la API de cancelación.
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      await axios.put(`${API_URL}/delivery/my-deliveries/${cancelModal}/cancel`, { reason: cancelReason }, getAuthHeaders());
+      toast.success("Delivery cancelled");
       setCancelModal(null);
-      setCancelReason("");
-    }, 1000);
+      setCancelReason("")
+      fetchOrders();
+    } catch (error: any) {
+      toast.error(error?.response?.data.message || "Failed to cancel delivery");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
