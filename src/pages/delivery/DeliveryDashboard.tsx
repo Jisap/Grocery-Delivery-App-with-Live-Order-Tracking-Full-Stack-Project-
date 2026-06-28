@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PackageIcon, NavigationIcon } from "lucide-react";
 import OtpModal from "../../components/Delivery/OtpModal";
 import CancelModal from "../../components/Delivery/CancelModal";
@@ -6,18 +6,26 @@ import DeliveryOrderCard from "../../components/Delivery/DeliveryOrderCard";
 import Loading from "../../components/Loading";
 import type { Order } from "../../types";
 import { dummyDashboardOrdersData } from "../../assets/assets";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 /**
  * Panel de control para socios de entrega (repartidores).
  * Gestiona la visualización de pedidos activos y completados mediante pestañas, 
  * permite compartir la ubicación en tiempo real y orquesta los modales para 
  * confirmar entregas (vía OTP) o cancelar pedidos.
- *
- * @component
- * @description Componente autónomo sin props externas. Actúa como contenedor de estado 
- * para los modales de OTP y cancelación, delegando la renderización de cada pedido 
- * al componente `DeliveryOrderCard`.
  */
+
+const API_URL = import.meta.env.VITE_BASE_URL || "http://localhost:3000/api"
+
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("delivery_token");
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+}
 
 
 export default function DeliveryDashboard() {
@@ -35,18 +43,69 @@ export default function DeliveryDashboard() {
   // Cancel modal
   const [cancelModal, setCancelModal] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
+  const watchIdRef = useRef<number | null>(null);
 
   const fetchOrders = async () => {
     setLoading(true);
-    // En producción, el cambio de 'tab' debería enviar un query param a la API 
-    // para filtrar los pedidos (ej. ?status=active o ?status=completed).
-    setOrders(dummyDashboardOrdersData as any);
-    setLoading(false);
+    try {
+      const { data } = await axios.get(`${API_URL}/delivery/my-deliveries?status=${tab}`, getAuthHeaders());
+      setOrders(data.orders);
+    } catch (error: any) {
+      toast.error(error.response.data.message || "Failed to load deliveries");
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchOrders();
   }, [tab]);
+
+  // Send location every 10s for active deliveries
+  useEffect(() => {                                                                                           // El rastreo solo se activa si se cumplen dos condiciones al inicio del useEffect:
+    const activeOrders = orders.filter((o) => ["Assigned", "Packed", "Out for Delivery"].includes(o.status))  // Debe haber al menos un pedido en estado activo y el usuario debe haber habilitado el botón de compartir ubicación.
+    if (activeOrders.length === 0 || !tracking) {                                                             // Si no se cumple alguna de estas condiciones, el efecto se detiene.
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null
+      }
+      return
+    }
+
+    const sendLocation = async (pos: GeolocationPosition) => {                                                // Función que toma la posición actual (lat, lng) y la envía a la API.
+      const { latitude: lat, longitude: lng } = pos.coords                                                      // Descompresión de la posición actual.
+      activeOrders.forEach((order) => {                                                                       // Itera sobre cada pedido activo.
+        axios.put(`${API_URL}/delivery/my-deliveries/${order.id}/location`, { lat, lng }, getAuthHeaders())     // Envía la posición a la API.
+          .catch(() => { })
+      })
+    }
+
+    watchIdRef.current = navigator.geolocation.watchPosition(                                                 // Inicia el seguimiento de la posición del usuario con una precisión alta y un intervalo de actualización de 10 segundos.
+      sendLocation,
+      (error) => console.log("Error tracking location", error),
+      { enableHighAccuracy: true, maximumAge: 10000 }
+    )
+
+    // Also send on interval for more consistent updates
+    const interval = setInterval(() => {                                                                      // Se establece un intervalo de 10 segundos para enviar actualizaciones de posición adicionales.
+      navigator.geolocation.getCurrentPosition(
+        sendLocation,
+        () => { },
+        { enableHighAccuracy: true }
+      )
+    }, 10000)
+
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null
+      }
+      clearInterval(interval)
+    }
+  }, [orders, tracking])
+
+
 
   const handleUpdateStatus = async (orderId: string, status: string) => {
     console.log(orderId, status); // Pendiente: Implementar llamada a la API.

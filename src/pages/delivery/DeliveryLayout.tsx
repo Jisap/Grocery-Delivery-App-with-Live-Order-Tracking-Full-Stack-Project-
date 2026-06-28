@@ -2,7 +2,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { LogOutIcon, TruckIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { DeliveryPartner } from "../../types";
-import { dummyDeliveryPartnerData } from "../../assets/assets";
+
 
 /**
  * Layout principal para la sección de socios de entrega (repartidores).
